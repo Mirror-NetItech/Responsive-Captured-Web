@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Responsive Viewport Capture</title>
+<style>
+    body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f0f4f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.container {
+  background-color: #f0f4f8;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 10px 10px 20px #d1d9e6, -10px -10px 20px #fff;
+  text-align: center;
+  width: 80%;
+  max-width: px;
+}
+
+h1 {
+  color: #555;
+  margin-bottom: 20px;
+  text-shadow: 1px 1px 3px #fff;
+}
+
+button {
+  background-color: #f0f4f8;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 24px;
+  margin-bottom: 20px;
+  box-shadow: 5px 5px 10px #d1d9e6, -5px -5px 10px #fff;
+  cursor: pointer;
+  font-weight: bold;
+  color: #555;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  box-shadow: inset 5px 5px 10px #d1d9e6, inset -5px -5px 10px #fff;
+}
+
+#displayContainer {
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: inset 5px 5px 10px #d1d9e6, inset -5px -5px 10px #fff;
+  background-color: #f0f4f8;
+  text-align: left;
+  color: #777;
+}
+
+#displayContainer p {
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+/* Styles for grouped device data */
+.device-group {
+    margin-bottom: 15px;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px #d1d9e6, -5px -5px 10px #fff;
+    background-color: #f0f4f8;
+    overflow: hidden;
+}
+
+.device-summary {
+    padding: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #555;
+    border-bottom: 1px solid #d1d9e6;
+    transition: background-color 0.3s ease;
+}
+
+.device-summary:hover {
+    background-color: #e0e8ef;
+}
+
+.device-entries {
+    max-height: 0; /* Initially hidden */
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+}
+
+.device-entries.expanded {
+    max-height: 500px; /* Set to a sufficiently large value for scrolling */
+    overflow-y: auto;
+}
+/* Existing CSS */
+
+/* Styles for delete button */
+.delete-button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    border-radius: 10px;
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    right: 10px;
+    top: 0;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-buttons {
+    text-align: right;
+    margin-top: 20px;
+}
+
+/* Style for each item in recycle bin */
+.recycle-bin-item {
+    border-bottom: 1px solid #eee;
+    padding: 10px;
+}
+
+.recycle-bin-item:last-child {
+    border-bottom: none;
+}
+
+.stored-data-item {
+    position: relative;
+}
+
+.device-group {
+    margin-bottom: 15px;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px #d1d9e6, -5px -5px 10px #fff;
+    background-color: #f0f4f8;
+    overflow: hidden;
+}
+
+.device-summary {
+    padding: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #555;
+    border-bottom: 1px solid #d1d9e6;
+    transition: background-color 0.3s ease;
+}
+
+.device-summary:hover {
+    background-color: #e0e8ef;
+}
+
+.device-entries {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+}
+
+.device-entries.expanded {
+    max-height: 500px;
+    overflow-y: auto;
+}
+@media (max-width: 600px) {
+  .container {
+    width: 95%;
+    padding: 20px;
+  }
+
+  button {
+    width: 100%;
+  }
+}
+</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+  <div class="container">
+    <h1>Device Information</h1>
+    <button id="captureButton">Capture Information</button>
+    <div id="displayContainer">
+      <!-- Data Display -->
+    </div>
+    <button id="openRecycleBin">Recycle Bin</button>
+
+    <!-- Recycle Bin Modal -->
+    <div id="recycleBinModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Recycle Bin</h2>
+        <div id="recycleBinContent">
+          <!-- Recycle Bin Content -->
+        </div>
+        <div class="modal-buttons">
+          <button id="restoreSelected">Restore Selected</button>
+          <button id="deleteSelected">Delete Permanently</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="scriptcode.js"></script>
+  <!--<script >
+      document.addEventListener('DOMContentLoaded', function() {
+    const captureButton = document.getElementById('captureButton');
+    const displayContainer = document.getElementById('displayContainer');
+    const openRecycleBinButton = document.getElementById('openRecycleBin');
+    const recycleBinModal = document.getElementById('recycleBinModal');
+    const recycleBinContent = document.getElementById('recycleBinContent');
+    const restoreSelectedButton = document.getElementById('restoreSelected');
+    const deleteSelectedButton = document.getElementById('deleteSelected');
+
+    // Load stored data
+    let storedData = JSON.parse(localStorage.getItem('deviceData')) || [];
+    let recycleBin = JSON.parse(localStorage.getItem('recycleBin')) || [];
+    displayGroupedData();
+
+    //Get Device information
+    function getDeviceInfo() {
+        const screenWidth = screen.width;
+        const screenHeight = screen.height;
+        const viewportWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        const orientation = screen.orientation && screen.orientation.type ? screen.orientation.type : (viewportWidth > viewportHeight ? 'landscape' : 'portrait');
+        const desktopMode = screenWidth > 1024;
+
+        // Device Information - MORE RELIABLE DEVICE NAME CAPTURE
+        const userAgent = navigator.userAgent;
+        let device = "Unknown Device";
+
+        // Attempt to extract more specific device info from userAgent
+        const deviceMatches = userAgent.match(/\(([^)]+)\)/);  // Gets content within parentheses
+        if (deviceMatches && deviceMatches[1]) {
+            device = deviceMatches[1].split(';')[0].trim();   // Take the first part before a semicolon.  (Robust to various UAs)
+        }
+
+        return {
+            screenWidth,
+            screenHeight,
+            viewportWidth,
+            viewportHeight,
+            orientation,
+            desktopMode,
+            device
+        };
+    }
+
+    function displayData(data, timestamp, index, deviceEntriesContainer) {
+        const dataDiv = document.createElement('div');
+        dataDiv.classList.add('stored-data-item');
+        dataDiv.innerHTML = `
+            <p><strong>Device:</strong> ${data.device}</p>
+            <p><strong>Screen Resolution:</strong> ${data.screenWidth} x ${data.screenHeight}</p>
+            <p><strong>Viewport:</strong> ${data.viewportWidth} x ${data.viewportHeight}</p>
+            <p><strong>Orientation:</strong> ${data.orientation}</p>
+            <p><strong>Mode:</strong> ${data.desktopMode ? 'Desktop' : 'Normal'}</p>
+            <p><strong>Captured On:</strong> ${timestamp}</p>
+        `;
+
+        const deleteButton = document.createElement('button');
+        deleteButton.classList.add('delete-button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', (event) => {
+            event.stopPropagation(); // Prevent device group from toggling
+            moveDataToRecycleBin(data, index);
+        });
+
+        dataDiv.appendChild(deleteButton);
+        return dataDiv; // Return the created element for grouping
+    }
+
+    function displayGroupedData() {
+        displayContainer.innerHTML = '';
+        if (storedData.length === 0) {
+            displayContainer.innerHTML = '<p>No data captured yet.</p>';
+            return;
+        }
+
+        const groupedData = storedData.reduce((acc, item, index) => {
+            if (!acc[item.device]) {
+                acc[item.device] = {
+                    entries: [],
+                    indices: []
+                };
+            }
+            acc[item.device].entries.push(item);
+            acc[item.device].indices.push(index); //Store the index for each device
+            return acc;
+        }, {});
+
+        for (const device in groupedData) {
+            const deviceEntries = groupedData[device].entries;
+            const deviceIndices = groupedData[device].indices; //Get index value for the device
+
+            const deviceGroup = document.createElement('div');
+            deviceGroup.classList.add('device-group');
+
+            const deviceSummary = document.createElement('div');
+            deviceSummary.classList.add('device-summary');
+            deviceSummary.textContent = `${device} (${deviceEntries.length} captures)`;
+            deviceGroup.appendChild(deviceSummary);
+
+            const deviceEntriesContainer = document.createElement('div');
+            deviceEntriesContainer.classList.add('device-entries');
+
+            deviceEntries.forEach((item, i) => {
+                const dataDiv = displayData(item, item.timestamp, deviceIndices[i], deviceEntriesContainer); //Pass the index too for Delete
+                deviceEntriesContainer.appendChild(dataDiv);
+            });
+
+            deviceGroup.appendChild(deviceEntriesContainer);
+            deviceSummary.addEventListener('click', () => {
+                deviceEntriesContainer.classList.toggle('expanded');
+            });
+            displayContainer.appendChild(deviceGroup);
+        }
+    }
+
+    function moveDataToRecycleBin(data, index) {
+        storedData.splice(index, 1); //Remove from storeData
+
+        // update indices in grouped data after deletion
+
+        recycleBin.push(data); //Add data to RecycleBin
+
+        localStorage.setItem('deviceData', JSON.stringify(storedData));
+        localStorage.setItem('recycleBin', JSON.stringify(recycleBin));
+        displayGroupedData(); // Refresh storedData display
+    }
+
+    //Function to display recycle bin datas
+    function displayRecycleBin() {
+        recycleBinContent.innerHTML = '';
+        if (recycleBin.length === 0) {
+            recycleBinContent.innerHTML = '<p>Recycle bin is empty.</p>';
+            return;
+        }
+        recycleBin.forEach((item, index) => {
+            const itemDiv = document.createElement('div');
+            itemDiv.classList.add('recycle-bin-item');
+            itemDiv.innerHTML = `
+                <p><strong>Device:</strong> ${item.device}</p>
+                <p><strong>Screen Resolution:</strong> ${item.screenWidth} x ${item.screenHeight}</p>
+                <p><strong>Viewport:</strong> ${item.viewportWidth} x ${item.viewportHeight}</p>
+                <p><strong>Orientation:</strong> ${item.orientation}</p>
+                <p><strong>Mode:</strong> ${item.desktopMode ? 'Desktop' : 'Normal'}</p>
+                <p><strong>Captured On:</strong> ${item.timestamp}</p>
+                <button class="restore-button" data-index="${index}">Restore</button>
+            `;
+            recycleBinContent.appendChild(itemDiv);
+        });
+        //Event delegation
+        recycleBinContent.addEventListener('click', function(event) {
+            if (event.target.classList.contains('restore-button')) {
+                const index = event.target.dataset.index;
+                restoreDataFromRecycleBin(index);
+            }
+        });
+    }
+
+    function restoreDataFromRecycleBin(index) {
+        const item = recycleBin[index];
+        if (!item) return;
+
+        recycleBin.splice(index, 1); //Remove item from recycleBin
+
+        storedData.push(item); //Add to StoreData
+
+        localStorage.setItem('deviceData', JSON.stringify(storedData));
+        localStorage.setItem('recycleBin', JSON.stringify(recycleBin));
+        displayGroupedData(); //Refresh Display
+        displayRecycleBin();
+    }
+
+    //Function For the Delete Selected button on recycleBinModal
+    function deleteSelectedFromRecycleBin() {
+        recycleBin = [];
+
+        localStorage.setItem('recycleBin', JSON.stringify(recycleBin));
+
+        displayGroupedData(); // Refresh storedData display
+        displayRecycleBin();
+    }
+
+    captureButton.addEventListener('click', function() {
+        const currentData = getDeviceInfo();
+        const timestamp = new Date().toLocaleString();
+        currentData.timestamp = timestamp;
+
+        // Check if data has changed (simplified comparison)
+        const lastEntryForDevice = storedData.filter(entry => entry.device === currentData.device).pop();
+        if (!lastEntryForDevice ||
+            lastEntryForDevice.screenWidth !== currentData.screenWidth ||
+            lastEntryForDevice.screenHeight !== currentData.screenHeight ||
+            lastEntryForDevice.viewportWidth !== currentData.viewportWidth ||
+            lastEntryForDevice.viewportHeight !== currentData.viewportHeight ||
+            lastEntryForDevice.orientation !== currentData.orientation ||
+            lastEntryForDevice.desktopMode !== currentData.desktopMode) {
+
+            // Store the data
+            storedData.push(currentData);
+            localStorage.setItem('deviceData', JSON.stringify(storedData));
+
+            displayGroupedData(); // Refresh the grouped display
+        } else {
+            alert("Device information has not changed since last capture.");
+        }
+    });
+
+    //Event Listener for Recycle Bin
+
+    openRecycleBinButton.addEventListener('click', function() {
+        recycleBinModal.style.display = 'block';
+        displayRecycleBin();
+    });
+
+    //Close button function on recycleBinModel
+
+    const closeButton = document.querySelector('.close');
+
+    closeButton.addEventListener('click', function() {
+        recycleBinModal.style.display = 'none';
+    });
+
+    // Restore Button in Modal
+    restoreSelectedButton.addEventListener('click', function() {
+        restoreDataFromRecycleBin();
+    });
+
+    // Delete Permanently
+    deleteSelectedButton.addEventListener('click', function() {
+        deleteSelectedFromRecycleBin();
+    });
+
+    // Prevent interaction with elements behind the modal while it's open
+
+    window.addEventListener('click', function(event) {
+        if (event.target === recycleBinModal) {
+            recycleBinModal.style.display = 'none';
+        }
+    });
+});
+
+  </script>-->
+</body>
+
+</html>
